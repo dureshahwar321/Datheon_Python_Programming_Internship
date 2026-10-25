@@ -1,6 +1,33 @@
 
 import csv
 
+# Read stock symbols and company names from CSV
+companies = {}
+
+with open("constituents.csv", "r", encoding="utf-8-sig", newline="") as file:
+    reader = csv.DictReader(file)
+
+    for row in reader:
+        symbol = row["Symbol"]
+        company = row["Security"]
+
+        companies[symbol] = company
+ 
+# Read sample current prices from CSV
+stock_prices = {}
+
+with open("stock_prices.csv", "r", encoding="utf-8-sig", newline="") as file:
+    reader = csv.DictReader(file)
+    print("CSV Columns:", reader.fieldnames)
+
+    for row in reader:
+        symbol = row["Symbol"]
+        price = float(row["CurrentPrice"])
+
+        stock_prices[symbol] = price
+       
+
+
 # Stock Portfolio Performance Tracker
 
 # Ask how many stocks the user wants to enter
@@ -22,10 +49,26 @@ for i in range(num_stocks):
 
     print("\nStock Number:", i + 1)
 
-    stock_name = input("Enter stock symbol: ")
+    
+    stock_name = input("Enter stock symbol: ").strip().upper()
+
+    if stock_name in companies:
+        print("Company:", companies[stock_name])
+    else:
+        print("Stock symbol not found in S&P 500 dataset.")
+
     buy_price = float(input("Enter buying price per share: "))
     quantity = int(input("Enter number of shares: "))
-    current_price = float(input("Enter current stock price: "))
+    
+    # Look up current price from sample CSV
+    if stock_name in stock_prices:
+        current_price = stock_prices[stock_name]
+        print("Sample Current Price:", current_price)
+    else:
+        print("Price not found in stock_prices.csv")
+        print("Please enter a stock listed in the sample price file.")
+        continue
+
 
     # Calculate investment
     total_investment = buy_price * quantity
