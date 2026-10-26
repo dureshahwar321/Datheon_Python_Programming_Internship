@@ -18,7 +18,7 @@ stock_prices = {}
 
 with open("stock_prices.csv", "r", encoding="utf-8-sig", newline="") as file:
     reader = csv.DictReader(file)
-    print("CSV Columns:", reader.fieldnames)
+    
 
     for row in reader:
         symbol = row["Symbol"]
@@ -31,7 +31,20 @@ with open("stock_prices.csv", "r", encoding="utf-8-sig", newline="") as file:
 # Stock Portfolio Performance Tracker
 
 # Ask how many stocks the user wants to enter
-num_stocks = int(input("How many stocks do you want to add? "))
+
+# Ask how many stocks the user wants to enter
+while True:
+    try:
+        num_stocks = int(input("How many stocks do you want to add? "))
+
+        if num_stocks > 0:
+            break
+        else:
+            print("Number of stocks must be greater than 0.")
+
+    except ValueError:
+        print("Invalid input! Please enter a whole number.")
+
 
 
 # Initialize portfolio totals
@@ -41,7 +54,7 @@ portfolio_value = 0
 
 # Store information about all stocks
 stocks_data = []
-
+portfolio = {}
 
 
 # Repeat for each stock
@@ -52,13 +65,44 @@ for i in range(num_stocks):
     
     stock_name = input("Enter stock symbol: ").strip().upper()
 
-    if stock_name in companies:
-        print("Company:", companies[stock_name])
-    else:
+    
+    if stock_name not in companies:
         print("Stock symbol not found in S&P 500 dataset.")
+        continue
 
-    buy_price = float(input("Enter buying price per share: "))
-    quantity = int(input("Enter number of shares: "))
+    if stock_name not in stock_prices:
+        print("Price not found in stock_prices.csv")
+        continue
+
+    print("Company:", companies[stock_name])
+
+
+    
+    while True:
+        try:
+            buy_price = float(input("Enter buying price per share: "))
+
+            if buy_price > 0:
+                break
+            else:
+                print("Buying price must be greater than 0.")
+
+        except ValueError:
+            print("Invalid input! Please enter a valid number.")
+
+    
+    while True:
+        try:
+            quantity = int(input("Enter number of shares: "))
+
+            if quantity > 0:
+                break
+            else:
+                print("Quantity must be greater than 0.")
+
+        except ValueError:
+            print("Invalid input! Please enter a whole number.")
+
     
     # Look up current price from sample CSV
     if stock_name in stock_prices:
@@ -84,9 +128,13 @@ for i in range(num_stocks):
 
     # Calculate profit or loss
     profit_loss = current_value - total_investment
-
+    
     # Calculate percentage gain or loss
-    percentage = (profit_loss / total_investment) * 100
+    if total_investment > 0:
+        percentage = (profit_loss / total_investment) * 100
+    else:
+        percentage = 0
+
 
     
     # Store stock information
@@ -100,6 +148,17 @@ for i in range(num_stocks):
         profit_loss,
         percentage
     ])
+     
+    # Store portfolio position in a dictionary
+    portfolio[stock_name] = {
+        "buy_price": buy_price,
+        "quantity": quantity,
+        "current_price": current_price,
+        "investment": total_investment,
+        "current_value": current_value,
+        "profit_loss": profit_loss,
+        "percentage": percentage
+    }
 
 
     # Display results
